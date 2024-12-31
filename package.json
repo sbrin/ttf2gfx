@@ -1,6 +1,6 @@
 {
   "name": "truetype2gfx",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "Convert TTF, OTF, WOFF to Adafruit GFX header file",
   "main": "index.js",
   "author": "Mikhail Ilin",

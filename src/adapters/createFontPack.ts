@@ -20,6 +20,9 @@ export function createFontPack(font: opentype.Font, glyphs: opentype.Glyph[], pi
 
     const glyphsMap = new Map<number, FontGlyph>();
 
+    let maxWidth = 0;
+    let maxHeight = 0;
+
     glyphs.forEach((glyph, index) => {
         const charCode = ASCII_START + index;
         const rasterized = rasterizeGlyph(glyph, font, pixelHeight);
@@ -29,7 +32,6 @@ export function createFontPack(font: opentype.Font, glyphs: opentype.Glyph[], pi
             char: String.fromCharCode(charCode),
             name: glyph.name ?? undefined,
             bytes: rasterized.bitmap,
-            // [xOffset, -yOffset, xAdvance, height],
             bounds: [rasterized.xOffset, rasterized.yOffset, rasterized.width, rasterized.height],
             deviceSize: [rasterized.width, rasterized.height],
             scalableSize: [rasterized.width, rasterized.height],
@@ -37,7 +39,12 @@ export function createFontPack(font: opentype.Font, glyphs: opentype.Glyph[], pi
         };
 
         glyphsMap.set(charCode, fontGlyph);
+
+        maxWidth = Math.max(maxWidth, rasterized.width);
+        maxHeight = Math.max(maxHeight, rasterized.height);
     });
+
+    meta.bounds = [0, 0, maxWidth, maxHeight];
 
     return {
         meta,
