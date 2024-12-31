@@ -1,11 +1,10 @@
+import {ASCII_END, ASCII_START} from '../const';
 import {FontPack} from '../core/glyphRasterizer';
 
 declare type GFXFont = {
     name: string;
     bitmaps: number[];
     glyphs: GFXGlyph[];
-    first: number;
-    last: number;
     yAdvance: number;
 };
 
@@ -26,7 +25,7 @@ function writeBit(byte: number, bit: number, value: number) {
     return byte | (value << bit);
 }
 
-export function encodeBitmap(bdfBytes: number[], width: number): number[] {
+function encodeBitmap(bdfBytes: number[], width: number): number[] {
     const gfxBytes: number[] = [];
     let byte = 0;
     let bitPos = 0;
@@ -63,21 +62,18 @@ function encodeGFX(font: FontPack): GFXFont {
     const bitmaps = [];
     const glyphs = [];
     let bitmapOffset = 0;
-    let first = 0x20;
-    let last = 0x7e;
-    for (let code = first; code <= last; code++) {
+    for (let code = ASCII_START; code <= ASCII_END; code++) {
         const glyph = font.glyphs.get(code);
         if (!glyph) {
             continue;
         }
         const bitmap = encodeBitmap(glyph.bytes, glyph.deviceSize[0]);
         bitmaps.push(...bitmap);
-        // bounds: [xOffset, -yOffset, xAdvance, height],
         glyphs.push({
             bitmapOffset,
-            width: glyph.deviceSize[0],
+            width: glyph.bounds[2],
             height: glyph.bounds[3],
-            xAdvance: glyph.bounds[2],
+            xAdvance: glyph.xAdvance,
             xOffset: glyph.bounds[0],
             yOffset: -glyph.bounds[1],
         });
@@ -88,8 +84,6 @@ function encodeGFX(font: FontPack): GFXFont {
         name,
         bitmaps,
         glyphs,
-        first,
-        last,
         yAdvance: font.meta.size.points,
     };
 }
@@ -146,13 +140,6 @@ export function toCppVariableName(str: string) {
     return variableName;
 }
 
-/**
- * Generates a C/C++ header file content for Adafruit_GFX-compatible font.
- *
- * @param glyphs - Array of GlyphBitmap objects representing each glyph.
- * @param fontName - The name of the font to be used in the generated header.
- * @returns A string containing the content of the .h file.
- */
 export function createGFXFont(fontData: FontPack): {name: string; content: string} {
     const gfxFont = encodeGFX(fontData);
     const gfxFile = `
@@ -165,7 +152,7 @@ ${gfxFont.glyphs.map((glyph) => `\t{\t${glyph.bitmapOffset},\t${glyph.width},\t$
 const GFXfont ${gfxFont.name} PROGMEM = {
     (uint8_t *)${gfxFont.name}Bitmaps,
     (GFXglyph *)${gfxFont.name}Glyphs,
-    0x${gfxFont.first.toString(16).padStart(2, '0').toUpperCase()}, 0x${gfxFont.last.toString(16).padStart(2, '0').toUpperCase()}, ${gfxFont.yAdvance + Math.floor(gfxFont.yAdvance / 10)}};
+    0x${ASCII_START.toString(16).padStart(2, '0').toUpperCase()}, 0x${ASCII_END.toString(16).padStart(2, '0').toUpperCase()}, ${gfxFont.yAdvance + Math.floor(gfxFont.yAdvance / 10)}};
 `;
     return {name: gfxFont.name, content: gfxFile};
 }

@@ -1,7 +1,7 @@
 import {loadFont, extractGlyphs, FontPack, debugCanvas} from './core/glyphRasterizer';
 import {DEFAULT_PIXEL_HEIGHT} from './const';
-import {createFontPack} from './adapters/lopakaFont';
-import {createGFXFont} from './adapters/GFXFont';
+import {createFontPack} from './adapters/createFontPack';
+import {createGFXFont} from './adapters/createGFXFont';
 
 /**
  * Converts a font File into an Adafruit_GFX-compatible font File.

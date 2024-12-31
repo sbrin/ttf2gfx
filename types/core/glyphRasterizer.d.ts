@@ -6,6 +6,7 @@ export declare type FontGlyph = {
     bytes: number[];
     bounds: number[];
     scalableSize?: number[];
+    xAdvance: number;
     deviceSize: number[];
 };
 export declare type FontMeta = {

@@ -8,6 +8,7 @@ export declare type FontGlyph = {
     bytes: number[];
     bounds: number[];
     scalableSize?: number[];
+    xAdvance: number;
     deviceSize: number[];
 };
 
@@ -153,7 +154,7 @@ export function rasterizeGlyph(glyph: opentype.Glyph, font: opentype.Font, pixel
 
     return {
         bitmap,
-        width: width,
+        width,
         height: trimmedHeight,
         xAdvance,
         xOffset,

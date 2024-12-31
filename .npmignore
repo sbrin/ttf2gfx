@@ -1,0 +1,9 @@
+src/
+.git/
+.gitignore
+.npmignore
+tsconfig.json
+rollup.config.js
+*.map
+node_modules/
+yarn.lock

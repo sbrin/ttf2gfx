@@ -33,6 +33,7 @@ export function createFontPack(font: opentype.Font, glyphs: opentype.Glyph[], pi
             bounds: [rasterized.xOffset, rasterized.yOffset, rasterized.width, rasterized.height],
             deviceSize: [rasterized.width, rasterized.height],
             scalableSize: [rasterized.width, rasterized.height],
+            xAdvance: rasterized.xAdvance,
         };
 
         glyphsMap.set(charCode, fontGlyph);
