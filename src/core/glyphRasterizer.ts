@@ -74,7 +74,7 @@ export function extractGlyphs(font: opentype.Font): opentype.Glyph[] {
  */
 export function rasterizeGlyph(glyph: opentype.Glyph, font: opentype.Font, pixelHeight: number): GlyphBitmap {
     const scale = pixelHeight / font.unitsPerEm;
-    const width = Math.ceil((glyph.advanceWidth ?? 0) * scale);
+    const width = Math.max(1, Math.ceil((glyph.advanceWidth ?? 0) * scale));
     const fontAscender = font.ascender;
     const fontDescender = font.descender;
     const totalFontHeight = fontAscender - fontDescender;
