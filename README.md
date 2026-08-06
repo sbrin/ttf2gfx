@@ -8,12 +8,12 @@ Works with [opentype.js](https://github.com/opentypejs/opentype.js)
 
 ## Features
 
--   **Font Parsing**: Supports TrueType Fonts (TTF), OpenType Fonts (OTF), and Web Open Font Format (WOFF).
--   **Glyph Selection**: Automatically extracts basic ASCII glyphs (character codes 32 to 126).
--   **Font Conversion**: Rasterizes vector glyphs into monochrome bitmaps suitable for Adafruit_GFX.
--   **Customization**: Allows specification of desired pixel height for font scaling.
--   **Output Formats**: Generates output as a `FontPack`, C/C++ header file (`.h`), or as a string.
--   **Browser Compatibility**: Designed for use as an ES5 module in browsers.
+- **Font Parsing**: Supports TrueType Fonts (TTF), OpenType Fonts (OTF), and Web Open Font Format (WOFF).
+- **Glyph Selection**: Automatically extracts basic ASCII glyphs (character codes 32 to 126).
+- **Font Conversion**: Rasterizes vector glyphs into monochrome bitmaps suitable for Adafruit_GFX.
+- **Customization**: Allows specification of desired pixel height for font scaling.
+- **Output Formats**: Generates output as a `FontPack`, C/C++ header file (`.h`), or as a string.
+- **Browser Compatibility**: Designed for use as an ES5 module in browsers.
 
 ## Installation
 
@@ -47,20 +47,20 @@ Converts a font file into an Adafruit GFX-compatible font format.
 
 #### Parameters
 
--   `inputFile` (File): The input font file (TTF, OTF, or WOFF format)
--   `pixelHeight` (number, optional): Desired font height in pixels. Defaults to 12.
--   `format` ('file' | 'string' | undefined, optional): Output format
-    -   `'file'`: Returns a File object containing the header file
-    -   `'string'`: Returns the raw header file content as a string
-    -   `undefined`: Returns a FontPack object (default)
+- `inputFile` (File): The input font file (TTF, OTF, or WOFF format)
+- `pixelHeight` (number, optional): Desired font height in pixels. Defaults to 12.
+- `format` ('file' | 'string' | undefined, optional): Output format
+    - `'file'`: Returns a File object containing the header file
+    - `'string'`: Returns the raw header file content as a string
+    - `undefined`: Returns a FontPack object (default)
 
 #### Returns
 
 Promise that resolves to one of:
 
--   `FontPack`: Internal font representation (when format is undefined)
--   `string`: Header file content (when format is 'string')
--   `File`: Header file object (when format is 'file')
+- `FontPack`: Internal font representation (when format is undefined)
+- `string`: Header file content (when format is 'string')
+- `File`: Header file object (when format is 'file')
 
 ## Debug Tools
 
@@ -76,17 +76,17 @@ debugCanvas(fontPack);
 
 Only fixed width fonts (no proper variable fonts support yet).
 
--   TrueType (.ttf)
--   OpenType (.otf)
--   WOFF (.woff)
+- TrueType (.ttf)
+- OpenType (.otf)
+- WOFF (.woff)
 
 ## Compatibility
 
 The generated font files are compatible with:
 
--   AdafruitGFX
--   TFT_eSPI
--   many others libs
+- AdafruitGFX
+- TFT_eSPI
+- many others libs
 
 ## License
 

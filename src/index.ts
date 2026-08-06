@@ -14,7 +14,7 @@ import {createGFXFont} from './adapters/createGFXFont';
 export async function truetype2gfx(
     inputFile: File,
     pixelHeight: number = DEFAULT_PIXEL_HEIGHT,
-    format?: 'file' | 'string'
+    format?: 'file' | 'string',
 ): Promise<FontPack | File | string> {
     try {
         // Load and parse the font
@@ -27,14 +27,15 @@ export async function truetype2gfx(
         switch (format) {
             case 'string':
                 return createGFXFont(fontPack).content;
-            case 'file':
+            case 'file': {
                 const gfxFont = createGFXFont(fontPack);
                 return new File([gfxFont.content], gfxFont.name + '.h', {type: 'text/plain'});
+            }
             default:
                 return fontPack;
         }
     } catch (error: any) {
-        throw new Error(`Font conversion failed: ${error.message}`);
+        throw new Error(`Font conversion failed: ${error.message}`, {cause: error});
     }
 }
 

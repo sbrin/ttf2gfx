@@ -121,21 +121,22 @@ export function rasterizeGlyph(glyph: opentype.Glyph, font: opentype.Font, pixel
     // Handle empty glyphs (space, etc.)
     if (minX > maxX || minY > maxY) {
         minX = 0;
-        minY = 0;
         maxX = 0;
+        minY = 0;
         maxY = 0;
     }
 
-    // Calculate new dimensions
+    // Calculate trimmed dimensions (tight bounding box, not advance width)
+    const trimmedWidth = maxX - minX + 1;
     const trimmedHeight = maxY - minY + 1;
 
     // Create new trimmed bitmap
-    const bytesPerRow = Math.ceil(width / 8);
+    const bytesPerRow = Math.ceil(trimmedWidth / 8);
     const bitmap: number[] = new Array(bytesPerRow * trimmedHeight).fill(0);
 
     // Copy only the content within bounds
     for (let y = 0; y < trimmedHeight; y++) {
-        for (let x = 0; x < width; x++) {
+        for (let x = 0; x < trimmedWidth; x++) {
             const srcX = x + minX;
             const srcY = y + minY;
             const byteIndex = y * bytesPerRow + Math.floor(x / 8);
@@ -154,7 +155,7 @@ export function rasterizeGlyph(glyph: opentype.Glyph, font: opentype.Font, pixel
 
     return {
         bitmap,
-        width,
+        width: trimmedWidth,
         height: trimmedHeight,
         xAdvance,
         xOffset,

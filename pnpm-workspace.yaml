@@ -1,0 +1,4 @@
+# Security overrides: force patched transitive deps that upstream parents
+# still pin to vulnerable ranges (GitHub Dependabot alerts).
+overrides:
+  serialize-javascript@<7.0.5: ^7.0.7

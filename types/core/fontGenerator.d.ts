@@ -1,4 +1,4 @@
-import { FontPack } from './glyphRasterizer';
+import {FontPack} from './glyphRasterizer';
 declare type GFXFont = {
     name: string;
     bitmaps: number[];

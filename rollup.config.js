@@ -12,5 +12,13 @@ export default {
         sourcemap: true,
         // exports: 'named',
     },
-    plugins: [resolve(), typescript({useTsconfigDeclarationDir: true}), json(), terser()],
+    plugins: [
+        resolve(),
+        // `include` is set explicitly because rpt2's default patterns use the
+        // `+(|x)` extglob, which picomatch >=2.3.2 no longer matches. Without
+        // this every .ts file is skipped and rollup fails parsing raw TypeScript.
+        typescript({useTsconfigDeclarationDir: true, include: ['**/*.ts', '**/*.tsx', '**/*.cts', '**/*.mts']}),
+        json(),
+        terser(),
+    ],
 };
