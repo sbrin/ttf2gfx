@@ -19,6 +19,7 @@
         "types"
     ],
     "scripts": {
+        "prebuild": "rm -rf types",
         "build": "rollup -c",
         "watch": "rollup -c -w",
         "test": "vitest run",
