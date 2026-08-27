@@ -38,6 +38,15 @@ export interface GlyphBitmap {
     yOffset: number;
 }
 export declare function loadFont(file: File): Promise<opentype.Font>;
+/**
+ * Coerces a caller-supplied pixel height into a usable integer.
+ *
+ * Callers routinely pass values straight from a number input, where clearing the
+ * field yields `''` and Vue's `v-model.number` leaves it as a string. Anything
+ * that is not a finite number becomes the default, and valid numbers are floored
+ * to at least one pixel so the rasterizer never builds a zero-sized canvas.
+ */
+export declare function normalizePixelHeight(pixelHeight: unknown): number;
 export declare function extractGlyphs(font: opentype.Font): opentype.Glyph[];
 /**
  * Rasterizes a glyph into a monochrome bitmap.

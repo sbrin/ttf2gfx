@@ -1,4 +1,4 @@
-import {loadFont, extractGlyphs, FontPack, debugCanvas} from './core/glyphRasterizer';
+import {loadFont, extractGlyphs, normalizePixelHeight, FontPack, debugCanvas} from './core/glyphRasterizer';
 import {DEFAULT_PIXEL_HEIGHT} from './const';
 import {createFontPack} from './adapters/createFontPack';
 import {createGFXFont} from './adapters/createGFXFont';
@@ -7,7 +7,8 @@ import {createGFXFont} from './adapters/createGFXFont';
  * Converts a font File into an Adafruit_GFX-compatible font File.
  *
  * @param inputFile - The input font File (TTF, OTF, WOFF).
- * @param pixelHeight - Desired font height in pixels. Defaults to 12.
+ * @param pixelHeight - Desired font height in pixels. Values below 1 pixel, or values
+ * that are not a finite number, fall back to a usable height. Defaults to 10.
  * @param format - Output format: 'file' for File object, 'string' for raw content, or undefined for FontPack object.
  * @returns A Promise that resolves to the output in the specified format (FontPack, File, or string).
  */
@@ -17,12 +18,20 @@ export async function truetype2gfx(
     format?: 'file' | 'string',
 ): Promise<FontPack | File | string> {
     try {
+        const height = normalizePixelHeight(pixelHeight);
+
         // Load and parse the font
         const font = await loadFont(inputFile);
 
         // Extract relevant glyphs
         const glyphs = extractGlyphs(font);
-        const fontPack = createFontPack(font, glyphs, pixelHeight);
+        const fontPack = createFontPack(font, glyphs, height);
+
+        // Space and friends are legitimately blank, but a font where nothing at all
+        // rasterized would silently yield a header that draws nothing on the device.
+        if (![...fontPack.glyphs.values()].some((glyph) => glyph.bytes.some((byte) => byte !== 0))) {
+            throw new Error(`Font conversion produced no visible glyphs at ${height}px.`);
+        }
 
         switch (format) {
             case 'string':
