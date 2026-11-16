@@ -1,20 +1,23 @@
 import {ASCII_END, ASCII_START} from '../const';
 import {FontPack} from '../core/glyphRasterizer';
 
-declare type GFXFont = {
-    name: string;
-    bitmaps: number[];
-    glyphs: GFXGlyph[];
-    yAdvance: number;
-};
-
-declare type GFXGlyph = {
+export type GFXGlyph = {
     bitmapOffset: number;
     width: number;
     height: number;
     xAdvance: number;
     xOffset: number;
     yOffset: number;
+};
+
+/** A font in Adafruit_GFX terms: one glyph entry for every code from `first` to `last`. */
+export type GFXFont = {
+    name: string;
+    bitmaps: number[];
+    glyphs: GFXGlyph[];
+    first: number;
+    last: number;
+    yAdvance: number;
 };
 
 function readBit(byte: number, bit: number) {
@@ -65,6 +68,8 @@ function encodeGFX(font: FontPack): GFXFont {
     for (let code = ASCII_START; code <= ASCII_END; code++) {
         const glyph = font.glyphs.get(code);
         if (!glyph) {
+            // Adafruit_GFX finds a glyph at `code - first`: a missing glyph keeps an empty entry.
+            glyphs.push({bitmapOffset, width: 0, height: 0, xAdvance: 0, xOffset: 0, yOffset: 0});
             continue;
         }
         const bitmap = encodeBitmap(glyph.bytes, glyph.deviceSize[0]);
@@ -84,7 +89,9 @@ function encodeGFX(font: FontPack): GFXFont {
         name,
         bitmaps,
         glyphs,
-        yAdvance: font.meta.size.points,
+        first: ASCII_START,
+        last: ASCII_END,
+        yAdvance: font.meta.size.points + Math.floor(font.meta.size.points / 10),
     };
 }
 
@@ -140,19 +147,34 @@ export function toCppVariableName(str: string) {
     return variableName;
 }
 
-export function createGFXFont(fontData: FontPack): {name: string; content: string} {
-    const gfxFont = encodeGFX(fontData);
-    const gfxFile = `
-const uint8_t ${gfxFont.name}Bitmaps[] PROGMEM = {
-${gfxFont.bitmaps.map((byte: number) => '0x' + byte.toString(16).padStart(2, '0').toUpperCase()).join(', ')}
+function hexByte(value: number): string {
+    return '0x' + value.toString(16).padStart(2, '0').toUpperCase();
+}
+
+/** Writes a font as the C header that Adafruit_GFX reads (`display.setFont(&name)`). */
+export function writeGFXHeader(gfxFont: GFXFont): string {
+    const {name} = gfxFont;
+    // A C array needs at least one element.
+    const bitmaps = gfxFont.bitmaps.length ? gfxFont.bitmaps : [0];
+    const bitmapLines: string[] = [];
+    for (let i = 0; i < bitmaps.length; i += 16) {
+        bitmapLines.push(bitmaps.slice(i, i + 16).map(hexByte).join(', '));
+    }
+    return `
+const uint8_t ${name}Bitmaps[] PROGMEM = {
+${bitmapLines.join(',\n')}
 };
-const GFXglyph ${gfxFont.name}Glyphs[] PROGMEM = {
+const GFXglyph ${name}Glyphs[] PROGMEM = {
 ${gfxFont.glyphs.map((glyph) => `\t{\t${glyph.bitmapOffset},\t${glyph.width},\t${glyph.height},\t${glyph.xAdvance},\t${glyph.xOffset},\t${glyph.yOffset}}`).join(',\n')}
 };
-const GFXfont ${gfxFont.name} PROGMEM = {
-    (uint8_t *)${gfxFont.name}Bitmaps,
-    (GFXglyph *)${gfxFont.name}Glyphs,
-    0x${ASCII_START.toString(16).padStart(2, '0').toUpperCase()}, 0x${ASCII_END.toString(16).padStart(2, '0').toUpperCase()}, ${gfxFont.yAdvance + Math.floor(gfxFont.yAdvance / 10)}};
+const GFXfont ${name} PROGMEM = {
+    (uint8_t *)${name}Bitmaps,
+    (GFXglyph *)${name}Glyphs,
+    ${hexByte(gfxFont.first)}, ${hexByte(gfxFont.last)}, ${gfxFont.yAdvance}};
 `;
-    return {name: gfxFont.name, content: gfxFile};
+}
+
+export function createGFXFont(fontData: FontPack): {name: string; content: string} {
+    const gfxFont = encodeGFX(fontData);
+    return {name: gfxFont.name, content: writeGFXHeader(gfxFont)};
 }
