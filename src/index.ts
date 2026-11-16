@@ -1,7 +1,8 @@
 import {loadFont, extractGlyphs, normalizePixelHeight, FontPack, debugCanvas} from './core/glyphRasterizer';
 import {DEFAULT_PIXEL_HEIGHT} from './const';
 import {createFontPack} from './adapters/createFontPack';
-import {createGFXFont} from './adapters/createGFXFont';
+import {createGFXFont, toCppVariableName} from './adapters/createGFXFont';
+import {bdfToGfx} from './adapters/bdfToGfx';
 
 /**
  * Converts a font File into an Adafruit_GFX-compatible font File.
@@ -48,4 +49,6 @@ export async function truetype2gfx(
     }
 }
 
-export {createGFXFont, debugCanvas};
+export {createGFXFont, bdfToGfx, toCppVariableName, debugCanvas};
+export type {BdfToGfxResult} from './adapters/bdfToGfx';
+export type {FontPack};
